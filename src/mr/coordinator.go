@@ -44,7 +44,7 @@ func (c *Coordinator) checkAllDone() bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if c.isAllDone {
-		log.Println("check [ All ] tasks done: ", true)
+		//	log.Println("check [ All ] tasks done: ", true)
 		return true
 	}
 	// only check reduce tasks, we will not issue reduce task before all map tasks finished
@@ -56,7 +56,7 @@ func (c *Coordinator) checkAllDone() bool {
 		}
 	}
 	c.isAllDone = flag
-	log.Println("check [ All ] tasks done: ", c.isAllDone)
+	//log.Println("check [ All ] tasks done: ", c.isAllDone)
 	return c.isAllDone
 }
 
@@ -65,7 +65,7 @@ func (c *Coordinator) checkMapTasksDone() bool {
 	defer c.mu.Unlock()
 	// check wheather all map tasks done ?
 	if c.isMapTasksDone {
-		log.Println("check [ Map ] tasks done: ", c.mapTaskFinished)
+		//		log.Println("check [ Map ] tasks done: ", c.mapTaskFinished)
 		return true
 	}
 
@@ -77,7 +77,7 @@ func (c *Coordinator) checkMapTasksDone() bool {
 		}
 	}
 	c.isMapTasksDone = flag
-	log.Println("check [ Map ] tasks done: ", c.mapTaskFinished)
+	// log.Println("check [ Map ] tasks done: ", c.mapTaskFinished)
 	return c.isMapTasksDone
 }
 
@@ -98,7 +98,7 @@ func (c *Coordinator) HandleAskTask(args *AskTaskArgs, reply *AskTaskReply) erro
 			return nil
 		} else if allMapDoneFlag {
 			// if we finished all map tasks, we are going to deal with reduce task
-			log.Println("going to issue reduce tasks")
+			//	log.Println("going to issue reduce tasks")
 			reply.TaskType = Reduce
 			// check weather there are not finished task
 			for n, done := range c.reduceTaskFinished {
@@ -123,12 +123,12 @@ func (c *Coordinator) HandleAskTask(args *AskTaskArgs, reply *AskTaskReply) erro
 			for m, done := range c.mapTaskFinished {
 				if !done {
 					if c.mapTaskIssued[m].IsZero() || time.Since(c.mapTaskIssued[m]).Seconds() > 10 {
-						reply.filename = c.filename[m]
+						reply.Filename = c.filename[m]
 						reply.Nreduce = c.nReduce
 						reply.Mmap = m
 
 						c.mapTaskIssued[m] = time.Now()
-						log.Println("map task [ index:", m, " name: ", c.filename[m], " ] issued")
+						//	log.Println("map task [ index:", m, " name: ", c.filename[m], " ] issued")
 						return nil
 					}
 				}
@@ -146,8 +146,8 @@ func (c *Coordinator) HandleAskTask(args *AskTaskArgs, reply *AskTaskReply) erro
 func (c *Coordinator) HandleFinishedTask(args *FinishedTaskArgs, reply *FinishedTaskReply) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	log.Printf("--------------- HandleFinishedTask -------------\n")
-	log.Println(args)
+	//	log.Printf("--------------- HandleFinishedTask -------------\n")
+	//	log.Println(args)
 	switch args.TaskType {
 	case Map:
 		c.mapTaskFinished[args.Mmap] = true
@@ -217,10 +217,10 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 	for i := 0; i < c.nReduce; i++ {
 		c.reduceTaskFinished[i] = false
 	}
-	log.Println("Initilization finished, content is as following:")
-	for index, filename := range c.filename {
-		log.Println("	index:", index, "filename:", filename, "finished:", c.mapTaskFinished[index], "time:", c.mapTaskIssued[index])
-	}
+	// log.Println("Initilization finished, content is as following:")
+	//for index, filename := range c.filename {
+	//		log.Println("	index:", index, "filename:", filename, "finished:", c.mapTaskFinished[index], "time:", c.mapTaskIssued[index])
+	// }
 	c.server()
 	return &c
 }

@@ -39,7 +39,7 @@ type AskTaskReply struct {
 	TaskType int    // which type of task
 	Mmap     int    // index of map task
 	Nreduce  int    // index of reduce task
-	filename string // for map task to read a file
+	Filename string // for map task to read a file
 }
 type FinishedTaskArgs struct {
 	TaskType int
